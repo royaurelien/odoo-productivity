@@ -1,0 +1,144 @@
+<odoo>
+  <!-- SEARCH VIEW -->
+  <record id="view_upgrade_plan_line_search" model="ir.ui.view">
+    <field name="name">upgrade.plan.line.search</field>
+    <field name="model">upgrade.plan.line</field>
+    <field name="arch" type="xml">
+      <search>
+        <field name="name"/>
+        <field name="author"/>
+        <field name="project_id"/>
+        <separator/>
+        <filter string="To Review" name="review" domain="[('review', '=', False)]"/>
+        <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+        <separator/>
+        <group expand="0" name="group_by" string="Group By">
+          <filter name="group_action" string="Action" context="{'group_by': 'action'}"/>
+          <filter name="group_review" string="Review" context="{'group_by': 'review'}"/>
+          <filter name="group_available" string="Available" context="{'group_by': 'available'}"/>
+          <separator/>
+          <filter name="group_author" string="Author" context="{'group_by': 'author'}"/>
+          <filter name="group_category" string="Category" context="{'group_by': 'category'}"/>
+          <filter name="group_repository" string="Repository" context="{'group_by': 'repository'}"/>
+        </group>
+      </search>
+    </field>
+  </record>
+
+  <!-- TREE VIEW -->
+  <record id="view_upgrade_plan_line_tree" model="ir.ui.view">
+    <field name="name">upgrade.plan.line.tree</field>
+    <field name="model">upgrade.plan.line</field>
+    <field name="arch" type="xml">
+      <tree editable="top" create="1" delete="1" multi_edit="1" open_form_view="True"
+        decoration-warning="need_action"
+        decoration-muted="review"
+      >
+        <field name="name"/>
+        <!-- <field name="parent_id" invisible="line_type != 'feature'"/> -->
+        <field name="technical_name" optional="show"/>
+        <field name="description" optional="hide"/>
+        <field name="author" optional="show"/>
+        <field name="category" optional="show"/>
+        <field name="url" widget="url" optional="hide"/>
+        <field name="repository" optional="hide"/>
+        <field name="version" optional="hide"/>
+        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+        <field name="available" optional="show"/>
+        <field name="action" readonly="review"/>
+        <field
+          name="duration"
+          widget="float_time"
+          sum="Total duration"
+          optional="hide"
+          readonly="not action"
+        />
+        <button name="action_validate"
+                type="object"
+                string="Validate"
+                invisible="not to_review"/>
+
+
+        <field name="reviewer" widget="many2one_avatar" readonly="1" optional="show"/>
+        <field name="project_id" optional="hide"/>
+        <field name="create_date" widget="datetime" optional="hide"/>
+        <field name="create_uid" widget="many2one_avatar" optional="hide"/>
+        <field name="review" column_invisible="1"/>
+        <field name="to_review" column_invisible="1"/>
+        <field name="need_action" column_invisible="True"/>
+        <field name="line_type" column_invisible="True"/>
+      </tree>
+    </field>
+  </record>
+
+  <!-- FORM VIEW -->
+  <record id="view_upgrade_plan_line_form" model="ir.ui.view">
+    <field name="name">upgrade.plan.line.form</field>
+    <field name="model">upgrade.plan.line</field>
+    <field name="arch" type="xml">
+      <form>
+        <field name="review" invisible="1"/>
+
+        <header>
+          <button name="action_validate" type="object" string="Validate"
+                  invisible="review or not action" groups="upgrade_plan.group_advanced"/>
+        </header>
+        <sheet>
+          <div class="oe_button_box" name="button_box">
+              <!-- <button class="oe_stat_button" type="object" name="action_view_partners" icon="fa-usd">
+                  <field string="Partners" name="partner_count" widget="statinfo"/>
+              </button> -->
+          </div>
+          <div class="oe_title mb24">
+              <field name="active" invisible="1"/>
+              <h1>
+                  <field id="name" class="text-break" name="name" required="1" default_focus="1" placeholder="e.g. Name"/>
+              </h1>
+              <h3>
+                <field name="technical_name" nolabel="1"/>
+              </h3>
+          </div>
+          <group>
+            <group string="Summary">
+              <field name="author"/>
+              <field name="version"/>
+              <field name="category"/>
+              <field name="repository"/>
+              <field name="url" wiget="url"/>
+              <field name="description"/>
+            </group>
+            <group string="Upgrade">
+              <field name="available" widget="boolean_toggle"/>
+              <field name="action"/>
+              <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+            </group>
+            <group string="Review">
+              <field name="reviewer" invisible="not review" widget="many2one_avatar"/>
+              <field name="review_date" invisible="not review" widget="datetime" string="Date"/>
+              <field name="write_date"/>
+              <field name="write_uid" widget="many2one_avatar"/>
+            </group>
+          </group>
+          <notebook>
+
+            <page string="Note">
+              <field name="note" nolabel="1"/>
+            </page>
+          </notebook>
+        </sheet>
+        <!-- Chatter -->
+        <div class="oe_chatter">
+            <field name="message_follower_ids"/>
+            <field name="activity_ids"/>
+            <field name="message_ids"/>
+        </div>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_view_upgrade_plan_line" model="ir.actions.act_window">
+    <field name="name">Upgrade Plan Line</field>
+    <field name="res_model">upgrade.plan.line</field>
+    <field name="view_mode">tree,form</field>
+  </record>
+</odoo>
