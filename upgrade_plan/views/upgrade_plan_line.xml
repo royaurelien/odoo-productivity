@@ -30,7 +30,7 @@
     <field name="name">upgrade.plan.line.tree</field>
     <field name="model">upgrade.plan.line</field>
     <field name="arch" type="xml">
-      <tree editable="top" create="1" delete="1" multi_edit="1" open_form_view="True"
+      <tree editable="bottom" create="1" delete="1" multi_edit="1" open_form_view="True"
         decoration-warning="need_action"
         decoration-muted="review"
       >
@@ -71,6 +71,23 @@
     </field>
   </record>
 
+  <record id="view_upgrade_plan_line_tree_feature" model="ir.ui.view">
+    <field name="name">upgrade.plan.line.tree</field>
+    <field name="model">upgrade.plan.line</field>
+    <field name="arch" type="xml">
+      <tree editable="bottom" create="1" delete="1" multi_edit="1">
+        <field name="name"/>
+        <field name="description" optional="show"/>
+        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+        <field name="project_id" optional="hide"/>
+        <field name="create_date" widget="datetime" optional="hide"/>
+        <field name="create_uid" widget="many2one_avatar" optional="hide"/>
+        <field name="need_action" column_invisible="1"/>
+        <field name="line_type" column_invisible="1"/>
+      </tree>
+    </field>
+  </record>
+
   <!-- FORM VIEW -->
   <record id="view_upgrade_plan_line_form" model="ir.ui.view">
     <field name="name">upgrade.plan.line.form</field>
@@ -78,18 +95,16 @@
     <field name="arch" type="xml">
       <form>
         <field name="review" invisible="1"/>
-
+        <field name="plan_id" invisible="1"/>
         <header>
           <button name="action_validate" type="object" string="Validate"
                   invisible="review or not action" class="btn-primary"/>
           <button name="action_cancel" type="object" string="Cancel"
-                  invisible="not review" groups="upgrade_plan.group_advanced"/>
+                  invisible="not review or plan_id.locked" groups="upgrade_plan.group_advanced"/>
         </header>
         <sheet>
           <div class="oe_button_box" name="button_box">
-              <!-- <button class="oe_stat_button" type="object" name="action_view_partners" icon="fa-usd">
-                  <field string="Partners" name="partner_count" widget="statinfo"/>
-              </button> -->
+              <button class="oe_stat_button" type="object" name="action_view_plan" string="Plan" icon="fa-map-o"/>
           </div>
           <div class="oe_title mb24">
               <field name="active" invisible="1"/>
@@ -102,11 +117,8 @@
           </div>
           <group>
             <group>
-            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+              <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
               <field name="available" widget="boolean_toggle"/>
-
-
-
             </group>
             <group>
               <field name="action" widget="selection_badge" invisible="review"/>
@@ -175,7 +187,7 @@
   </record>
 
   <record id="action_view_upgrade_plan_line" model="ir.actions.act_window">
-    <field name="name">Upgrade Plan Line</field>
+    <field name="name">Lines</field>
     <field name="res_model">upgrade.plan.line</field>
     <field name="view_mode">tree,form</field>
   </record>

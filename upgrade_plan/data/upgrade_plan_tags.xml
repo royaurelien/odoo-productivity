@@ -39,4 +39,7 @@
     <record id="tag_own" model="upgrade.plan.tags">
         <field name="name">Own</field>
     </record>
+    <record id="tag_requested_migration" model="upgrade.plan.tags">
+        <field name="name">Requested migration</field>
+    </record>
 </odoo>

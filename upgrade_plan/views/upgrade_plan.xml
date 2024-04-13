@@ -75,14 +75,14 @@
             string="Guess repositories"
             type="object"
             class="btn-secondary"
-            invisible="not module_line_ids or locked"
+            invisible="not modules or locked"
           />
           <button
             name="action_new_revision"
             string="New revision"
             type="object"
             class="btn-secondary"
-            invisible="not lines or locked"
+            invisible="not line_ids or locked"
           />
           <button
             name="action_validate"
@@ -146,7 +146,7 @@
               <field name="locked" invisible="1"/>
               <field name="to_review" invisible="1"/>
               <field name="is_complete" invisible="1"/>
-              <field name="module_line_ids" invisible="1"/>
+              <field name="modules" invisible="1"/>
               <h1>
                   <field
                     id="name"
@@ -176,7 +176,7 @@
           </group>
           <notebook>
             <page string="Content">
-              <field name="lines" widget="section_and_note_one2many" mode="tree"
+              <field name="line_ids" widget="section_and_note_one2many" mode="tree"
                   readonly="state == 'cancel' or locked">
                 <tree string="Lines" editable="bottom" limit="200"
                     decoration-muted="review"
@@ -194,6 +194,7 @@
                   <field name="name" />
                   <field name="technical_name" optional="show" />
                   <field name="author" readonly="1" optional="hide" />
+                  <field name="category" readonly="1" optional="hide" />
                   <field name="available" readonly="1" optional="hide" />
 
                   <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="show" />
@@ -244,7 +245,7 @@
   </record>
 
   <record id="action_view_upgrade_plan" model="ir.actions.act_window">
-    <field name="name">Upgrade Plan</field>
+    <field name="name">Plans</field>
     <field name="res_model">upgrade.plan</field>
     <field name="view_mode">tree,form</field>
   </record>

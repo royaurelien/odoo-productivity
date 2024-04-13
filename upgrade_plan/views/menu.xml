@@ -8,7 +8,7 @@
 
     <menuitem
         id="upgrade_plan_menu"
-        name="Upgrade Plan"
+        name="Upgrade Plans"
         parent="upgrade_plan_menu_root"
         sequence="10"
         action="action_view_upgrade_plan"

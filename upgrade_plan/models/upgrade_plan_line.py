@@ -32,13 +32,13 @@ class UpgradePlanLine(models.Model):
     repository = fields.Char()
     url = fields.Char()
     version = fields.Char()
-    upgrade_id = fields.Many2one(
+    plan_id = fields.Many2one(
         comodel_name="upgrade.plan",
         required=True,
         ondelete="cascade",
     )
     project_id = fields.Many2one(
-        related="upgrade_id.project_id",
+        related="plan_id.project_id",
     )
     reviewer = fields.Many2one(
         comodel_name="res.users",
@@ -48,10 +48,10 @@ class UpgradePlanLine(models.Model):
         relation="upgrade_plan_line_tags_rel",
         string="Tags",
     )
-    parent_id = fields.Many2one(
-        comodel_name="upgrade.plan.line", compute="_compute_parent"
-    )
-
+    # parent_id = fields.Many2one(
+    #     comodel_name="upgrade.plan.line",
+    #     compute="_compute_parent",
+    # )
     available = fields.Boolean(
         default=False,
         tracking=True,
@@ -109,39 +109,43 @@ class UpgradePlanLine(models.Model):
                 record.line_type == "module" and not record.action and not record.review
             )
 
-    @api.depends("sequence")
-    def _compute_parent(self):
+    # @api.depends("sequence")
+    # def _compute_parent(self):
+    #     for record in self:
+    #         if record.line_type != "feature":
+    #             record.parent_id = False
+
+    #         data = (
+    #             record.plan_id.line_ids.filtered_domain(
+    #                 [("sequence", "<=", record.sequence)]
+    #             )
+    #             .sorted("sequence", reverse=False)
+    #             .read(["sequence", "line_type", "plan_id"])
+    #         )
+
+    #         res = [(item["line_type"], item["id"]) for item in data]
+
+    #         parent_id = False
+
+    #         for line_type, id in res:  # pylint: disable=W0622
+    #             if not line_type:
+    #                 continue
+    #             if line_type == "module":
+    #                 parent_id = id
+    #                 continue
+
+    #         _logger.warning(res)
+
+    #         record.parent_id = parent_id
+
+    @api.depends("name", "line_type")
+    def _compute_display_name(self):
         for record in self:
-            if record.line_type != "feature":
-                record.parent_id = False
-
-            data = (
-                record.upgrade_id.lines.filtered_domain(
-                    [("sequence", "<=", record.sequence)]
-                )
-                .sorted("sequence", reverse=False)
-                .read(["sequence", "line_type", "upgrade_id"])
+            record.display_name = (
+                f"Module - {record.name}"
+                if record.line_type == "module"
+                else record.name
             )
-
-            res = [(item["line_type"], item["id"]) for item in data]
-
-            parent_id = False
-
-            for line_type, id in res:  # pylint: disable=W0622
-                if not line_type:
-                    continue
-                if line_type == "module":
-                    parent_id = id
-                    continue
-
-            _logger.warning(res)
-
-            record.parent_id = parent_id
-
-    def guess_repository(self):
-        for record in self.filtered(lambda item: item.url and not item.repository):
-            if "github.com/OCA" in record.url:
-                record.repository = record.url.split("/")[-1]
 
     def action_validate(self):
         self.write(
@@ -161,6 +165,30 @@ class UpgradePlanLine(models.Model):
             }
         )
 
+    def action_view_plan(self):
+        self.ensure_one()
+
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "upgrade_plan.action_view_upgrade_plan"
+        )
+        action.update(
+            {
+                "view_mode": "form",
+                "res_id": self.plan_id.id,
+                "views": [
+                    (view_id, view_type)
+                    for view_id, view_type in action["views"]
+                    if view_type == "form"
+                ],
+            }
+        )
+        return action
+
+    def guess_repository(self):
+        for record in self.filtered(lambda item: item.url and not item.repository):
+            if "github.com/OCA" in record.url:
+                record.repository = record.url.split("/")[-1]
+
     @api.model_create_multi
     def create(self, vals_list):
         # number = 1
@@ -173,12 +201,3 @@ class UpgradePlanLine(models.Model):
                 # number += 1
 
         return super().create(vals_list)
-
-    @api.depends("name", "line_type")
-    def _compute_display_name(self):
-        for record in self:
-            record.display_name = (
-                f"Module - {record.name}"
-                if record.line_type == "module"
-                else record.name
-            )

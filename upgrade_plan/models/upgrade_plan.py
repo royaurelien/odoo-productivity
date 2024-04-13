@@ -54,21 +54,21 @@ class UpgradePlan(models.Model):
         related="project_id.partner_id",
         store=True,
     )
-    lines = fields.One2many(
+    line_ids = fields.One2many(
         comodel_name="upgrade.plan.line",
-        inverse_name="upgrade_id",
+        inverse_name="plan_id",
         copy=True,
     )
 
-    module_line_ids = fields.One2many(
+    modules = fields.One2many(
         comodel_name="upgrade.plan.line",
-        inverse_name="upgrade_id",
+        inverse_name="plan_id",
         domain=[("line_type", "=", "module")],
     )
 
     features = fields.One2many(
         comodel_name="upgrade.plan.line",
-        inverse_name="upgrade_id",
+        inverse_name="plan_id",
         domain=[("line_type", "=", "feature")],
     )
 
@@ -110,17 +110,17 @@ class UpgradePlan(models.Model):
         store=True,
     )
 
-    @api.depends("lines.duration")
+    @api.depends("line_ids.duration")
     def _compute_duration(self):
         for record in self:
-            record.total_duration = sum(record.lines.mapped("duration"))
+            record.total_duration = sum(record.line_ids.mapped("duration"))
 
-    @api.depends("module_line_ids", "module_line_ids.review")
+    @api.depends("modules", "modules.review")
     def _compute_progress(self):
         for record in self:
-            total = len(record.module_line_ids)
+            total = len(record.modules)
             to_review = total - len(
-                record.module_line_ids.filtered(lambda item: not item.review)
+                record.modules.filtered(lambda item: not item.review)
             )
             record.progress = (
                 round(100.0 * to_review / total, 2) if to_review > 0.0 else 0.0
@@ -155,20 +155,27 @@ class UpgradePlan(models.Model):
     def action_guess_repositories(self):
         self.ensure_one()
 
-        self.module_line_ids.guess_repository()
+        self.modules.guess_repository()
 
     def action_view_modules(self):
         self.ensure_one()
         action = self.env["ir.actions.actions"]._for_xml_id(
             "upgrade_plan.action_view_upgrade_plan_line"
         )
-        action["domain"] = [
-            ("id", "in", self.module_line_ids.ids),
-        ]
-        action["context"] = {
-            "default_upgrade_id": self.id,
-            "default_line_type": "module",
-        }
+        action.update(
+            {
+                "domain": [
+                    ("id", "in", self.modules.ids),
+                ],
+                "context": {
+                    "default_plan_id": self.id,
+                    "default_line_type": "module",
+                    "create": not self.locked,
+                    "delete": not self.locked,
+                    "edit": not self.locked,
+                },
+            }
+        )
         return action
 
     def action_view_features(self):
@@ -176,13 +183,30 @@ class UpgradePlan(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id(
             "upgrade_plan.action_view_upgrade_plan_line"
         )
-        action["domain"] = [
-            ("id", "in", self.features.ids),
-        ]
-        action["context"] = {
-            "default_upgrade_id": self.id,
-            "default_line_type": "feature",
-        }
+
+        action.update(
+            {
+                "domain": [
+                    ("id", "in", self.features.ids),
+                ],
+                "context": {
+                    "default_plan_id": self.id,
+                    "default_line_type": "feature",
+                    "create": not self.locked,
+                    "delete": not self.locked,
+                    "edit": not self.locked,
+                },
+                "views": [
+                    [
+                        self.env.ref(
+                            "upgrade_plan.view_upgrade_plan_line_tree_feature"
+                        ).id,
+                        "tree",
+                    ]
+                ],
+            }
+        )
+
         return action
 
     def action_new_revision(self):
