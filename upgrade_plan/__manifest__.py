@@ -20,6 +20,7 @@
         "data/upgrade_plan_tags.xml",
         "views/upgrade_plan.xml",
         "views/upgrade_plan_line.xml",
+        "views/upgrade_plan_tags.xml",
         "views/menu.xml",
     ],
     "demo": [],

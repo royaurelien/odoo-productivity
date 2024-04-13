@@ -5,7 +5,7 @@
     <field name="model">upgrade.plan.line</field>
     <field name="arch" type="xml">
       <search>
-        <field name="name"/>
+        <field name="name" filter_domain="['|', ('name','ilike',self), ('technical_name','ilike',self)]" string="Name"/>
         <field name="author"/>
         <field name="project_id"/>
         <separator/>
@@ -81,7 +81,9 @@
 
         <header>
           <button name="action_validate" type="object" string="Validate"
-                  invisible="review or not action" groups="upgrade_plan.group_advanced"/>
+                  invisible="review or not action" class="btn-primary"/>
+          <button name="action_cancel" type="object" string="Cancel"
+                  invisible="not review" groups="upgrade_plan.group_advanced"/>
         </header>
         <sheet>
           <div class="oe_button_box" name="button_box">
@@ -99,32 +101,68 @@
               </h3>
           </div>
           <group>
-            <group string="Summary">
+            <group>
+            <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+              <field name="available" widget="boolean_toggle"/>
+
+
+
+            </group>
+            <group>
+              <field name="action" widget="selection_badge" invisible="review"/>
+              <field name="action"
+                readonly="1"
+                invisible="not review"
+                widget="badge"
+                decoration-danger="action == 'drop'"
+                decoration-warning="action == 'migrate'"
+                decoration-success="action in ('keep', 'install')"
+              />
+              <field name="duration" widget="float_time"/>
+            </group>
+            <separator string="Summary" colspan="4"/>
+            <group>
               <field name="author"/>
               <field name="version"/>
-              <field name="category"/>
-              <field name="repository"/>
-              <field name="url" wiget="url"/>
               <field name="description"/>
             </group>
-            <group string="Upgrade">
-              <field name="available" widget="boolean_toggle"/>
-              <field name="action"/>
-              <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+            <group>
+              <field name="category"/>
+              <field name="repository"/>
+              <field name="url" widget="url"/>
             </group>
             <group string="Review">
               <field name="reviewer" invisible="not review" widget="many2one_avatar"/>
               <field name="review_date" invisible="not review" widget="datetime" string="Date"/>
-              <field name="write_date"/>
-              <field name="write_uid" widget="many2one_avatar"/>
             </group>
           </group>
-          <notebook>
-
-            <page string="Note">
+          <!-- <notebook>
+            <page name="summary" string="Summary">
+              <group>
+                <group>
+                  <field name="author"/>
+                  <field name="version"/>
+                  <field name="category"/>
+                  <field name="repository"/>
+                  <field name="url" wiget="url"/>
+                </group>
+                <group>
+                  <field name="description"/>
+                </group>
+              </group>
+            </page>
+            <page name="note" string="Note">
               <field name="note" nolabel="1"/>
             </page>
-          </notebook>
+            <page name="other" string="Other" groups="base.group_no_one">
+              <group>
+                <group>
+                  <field name="write_date"/>
+                  <field name="write_uid" widget="many2one_avatar"/>
+                </group>
+            </group>
+            </page>
+          </notebook> -->
         </sheet>
         <!-- Chatter -->
         <div class="oe_chatter">

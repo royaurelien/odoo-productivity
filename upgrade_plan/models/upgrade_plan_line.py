@@ -58,7 +58,6 @@ class UpgradePlanLine(models.Model):
     )
     review = fields.Boolean(
         default=False,
-        tracking=True,
     )
     to_review = fields.Boolean(
         compute="_compute_review",
@@ -153,6 +152,15 @@ class UpgradePlanLine(models.Model):
             }
         )
 
+    def action_cancel(self):
+        self.write(
+            {
+                "review": False,
+                "reviewer": False,
+                "review_date": False,
+            }
+        )
+
     @api.model_create_multi
     def create(self, vals_list):
         # number = 1
@@ -165,3 +173,12 @@ class UpgradePlanLine(models.Model):
                 # number += 1
 
         return super().create(vals_list)
+
+    @api.depends("name", "line_type")
+    def _compute_display_name(self):
+        for record in self:
+            record.display_name = (
+                f"Module - {record.name}"
+                if record.line_type == "module"
+                else record.name
+            )

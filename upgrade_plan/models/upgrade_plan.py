@@ -1,4 +1,5 @@
 # pylint: disable=C0103,C0116
+import ast
 
 from odoo import api, fields, models
 
@@ -15,11 +16,16 @@ class UpgradePlan(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _description = "Upgrade Plan"
 
-    name = fields.Char(required=True)
-    active = fields.Boolean(default=True)
+    name = fields.Char(
+        required=True,
+        index=True,
+    )
+    active = fields.Boolean(
+        default=True,
+    )
     description = fields.Text()
     version = fields.Integer(
-        String="Revision",
+        string="Revision",
         default=1,
         readonly=True,
     )
@@ -27,7 +33,11 @@ class UpgradePlan(models.Model):
         comodel_name="upgrade.plan",
         string="Previous Plan",
     )
-
+    user_id = fields.Many2one(
+        comodel_name="res.users",
+        string="Assigned to",
+        tracking=True,
+    )
     from_version = fields.Char(
         required=True,
         string="From",
@@ -36,13 +46,13 @@ class UpgradePlan(models.Model):
         required=True,
         string="To",
     )
-
     project_id = fields.Many2one(
         comodel_name="project.project",
         required=True,
     )
     partner_id = fields.Many2one(
         related="project_id.partner_id",
+        store=True,
     )
     lines = fields.One2many(
         comodel_name="upgrade.plan.line",
@@ -176,6 +186,8 @@ class UpgradePlan(models.Model):
         return action
 
     def action_new_revision(self):
+        self.ensure_one()
+
         IrAttachment = self.env["ir.attachment"]
         for record in self:
             new_plan = record.sudo().copy(
@@ -204,6 +216,27 @@ class UpgradePlan(models.Model):
                 "active": False,
             }
         )
+
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "upgrade_plan.action_view_upgrade_plan"
+        )
+        action.update(
+            {
+                "domain": [],
+                "context": {
+                    **ast.literal_eval(action.get("context", {})),
+                    "create": False,
+                },
+                "view_mode": "form",
+                "res_id": new_plan.id,
+                "views": [
+                    (view_id, view_type)
+                    for view_id, view_type in action["views"]
+                    if view_type == "form"
+                ],
+            }
+        )
+        return action
 
     @api.depends("name", "version")
     def _compute_display_name(self):

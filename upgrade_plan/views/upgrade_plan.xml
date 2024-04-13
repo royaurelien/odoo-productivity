@@ -5,13 +5,22 @@
     <field name="model">upgrade.plan</field>
     <field name="arch" type="xml">
       <search>
-        <field name="name"/>
+        <field name="name" />
         <field name="project_id" />
+        <field name="partner_id" />
+        <separator/>
+        <filter string="My Reviews" name="reviews" domain="[('user_id', '=', uid)]"/>
+        <filter string="Unassigned Plans" domain="[('user_id','=',False)]" name="unassigned"/>
         <separator/>
         <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
         <separator/>
         <group expand="0" name="group_by" string="Group By">
           <filter name="group_project" string="Project" context="{'group_by': 'project_id'}"/>
+          <filter name="group_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+          <filter name="group_assignee" string="Assignee" context="{'group_by':'user_id'}"/>
+          <filter name="group_by_create_date" string="Creation Date" context="{'group_by':'create_date:week'}"/>
+          <separator/>
+          <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
         </group>
       </search>
     </field>
@@ -41,6 +50,7 @@
         />
         <field name="create_date" widget="datetime" optional="hide"/>
         <field name="create_uid" widget="many2one_avatar" optional="hide"/>
+        <field name="user_id" optional="show" widget="many2one_avatar_user" options="{'no_quick_create': True}"/>
       </tree>
     </field>
   </record>
@@ -151,33 +161,24 @@
           </div>
           <group>
             <group>
-              <field name="project_id" widget="many2one"/>
-              <field name="partner_id" widget="many2one_avatar"/>
-              <label for="from_version" string="Version"/>
+              <field name="project_id" widget="many2one" />
+              <field name="partner_id" widget="many2one_avatar" />
+              <label for="from_version" string="Version" />
               <div>
-                  From <field name="from_version" placeholder="e.g. 12.0" class="oe_inline"/> to <field name="to_version" placeholder="e.g. 17.0" class="oe_inline"/>
+                  From <field name="from_version" placeholder="e.g. 12.0" class="oe_inline" readonly="state != 'draft'"/> to <field name="to_version" placeholder="e.g. 17.0" class="oe_inline" readonly="state != 'draft'"/>
               </div>
             </group>
             <group>
-              <field name="progress" widget="progressbar"/>
-              <field
-                name="total_duration"
-                widget="float_time"
-                sum="Total duration"
-              />
+              <field name="user_id" optional="show" widget="many2one_avatar_user" options="{'no_quick_create': True}" />
+              <field name="progress" widget="progressbar" />
+              <field name="total_duration" widget="float_time" sum="Total duration" />
             </group>
           </group>
           <notebook>
             <page string="Content">
-              <field
-                  name="lines"
-                  widget="section_and_note_one2many"
-                  mode="tree"
+              <field name="lines" widget="section_and_note_one2many" mode="tree"
                   readonly="state == 'cancel' or locked">
-                <tree
-                    string="Lines"
-                    editable="bottom"
-                    limit="200"
+                <tree string="Lines" editable="bottom" limit="200"
                     decoration-muted="review"
                     decoration-warning="need_action"
                 >
@@ -188,16 +189,14 @@
                       <create name="add_note_control" string="Add a note" context="{'default_display_type': 'line_note', 'default_line_type': False}"/>
                       <!-- <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link" context="{'order_id': parent.id}"/> -->
                   </control>
-
                   <field name="sequence" widget="handle" />
-                  <!-- We do not display the type because we don't want the user to be bothered with that information if he has no section or note. -->
-                  <field name="display_type" column_invisible="True"/>
-                  <field name="name"/>
-                  <field name="technical_name" optional="show"/>
-                  <field name="author" readonly="1" optional="hide"/>
-                  <field name="available" readonly="1" optional="hide"/>
+                  <field name="display_type" column_invisible="True" />
+                  <field name="name" />
+                  <field name="technical_name" optional="show" />
+                  <field name="author" readonly="1" optional="hide" />
+                  <field name="available" readonly="1" optional="hide" />
 
-                  <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="show"/>
+                  <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}" optional="show" />
                   <field name="action"
                     readonly="1"
                     widget="badge"
@@ -213,16 +212,10 @@
                     readonly="not action"
                   />
                   <field name="reviewer" widget="many2one_avatar" readonly="1" optional="show"/>
-                  <!-- <button name="action_validate"
-                          type="object"
-                          string="Validate"
-                          invisible="not to_review"/> -->
                   <field name="line_type" column_invisible="True"/>
                   <field name="review" column_invisible="True"/>
                   <field name="to_review" column_invisible="True"/>
                   <field name="need_action" column_invisible="True"/>
-
-
                 </tree>
               </field>
             </page>
