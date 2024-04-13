@@ -64,6 +64,13 @@
         <!-- <field name="custom_field" invisible="1"/> -->
         <header>
           <button
+            name="action_cancel"
+            string="Cancel"
+            type="object"
+            class="btn-secondary"
+            invisible="state not in ('draft', 'progress') or locked"
+          />
+          <button
             name="action_unlock"
             type="object"
             string="Unlock"
@@ -72,7 +79,7 @@
           />
           <button
             name="action_guess_repositories"
-            string="Guess repositories"
+            string="Parse repositories"
             type="object"
             class="btn-secondary"
             invisible="not modules or locked"
@@ -85,13 +92,6 @@
             invisible="not line_ids or locked"
           />
           <button
-            name="action_validate"
-            string="Validate"
-            type="object"
-            class="btn-primary"
-            invisible="not is_complete or state not in ('progress') or locked"
-          />
-          <button
             name="action_progress"
             string="In Progress"
             type="object"
@@ -99,22 +99,21 @@
             invisible="state not in ('draft') or locked"
           />
           <button
-            name="action_cancel"
-            string="Cancel"
+            name="action_validate"
+            string="Validate"
             type="object"
-            class="btn-secondary"
-            invisible="state not in ('draft', 'progress') or locked"
+            class="btn-primary"
+            invisible="not is_complete or state not in ('progress') or locked"
           />
-
-          <!-- <button name="action_cancel" type="object" string="Cancel" invisible="state not in ['draft', 'sent', 'sale'] or not id" data-hotkey="x"/> -->
-          <!-- <button name="action_draft" invisible="state != 'cancel'" type="object" string="Set to Quotation" data-hotkey="w"/> -->
-
-          <button name="action_lock" type="object" string="Lock"
-              help="If the sale is locked, you can not modify it anymore. However, you will still be able to invoice or deliver."
+          <button name="action_lock"
+              type="object"
+              string="Lock"
+              help="If the plan is locked, you can not modify it anymore."
               invisible="locked or state != 'done'"
-              groups="upgrade_plan.group_advanced"/>
-
-          <field name="state" widget="statusbar" statusbar_visible="draft,progress,done"/>
+              class="btn-primary"
+              groups="upgrade_plan.group_advanced"
+            />
+            <field name="state" widget="statusbar" statusbar_visible="draft,progress,done"/>
           </header>
         <sheet>
           <div class="oe_button_box" name="button_box">
@@ -161,23 +160,28 @@
           </div>
           <group>
             <group>
-              <field name="project_id" widget="many2one" />
-              <field name="partner_id" widget="many2one_avatar" />
-              <label for="from_version" string="Version" />
+              <field name="project_id" widget="many2one" readonly="state != 'draft'"/>
+              <field name="partner_id" widget="many2one_avatar"/>
+              <label for="from_version" string="Version"/>
               <div>
                   From <field name="from_version" placeholder="e.g. 12.0" class="oe_inline" readonly="state != 'draft'"/> to <field name="to_version" placeholder="e.g. 17.0" class="oe_inline" readonly="state != 'draft'"/>
               </div>
             </group>
             <group>
-              <field name="user_id" optional="show" widget="many2one_avatar_user" options="{'no_quick_create': True}" />
-              <field name="progress" widget="progressbar" />
-              <field name="total_duration" widget="float_time" sum="Total duration" />
+              <field
+                name="user_id"
+                readonly="locked"
+                widget="many2one_avatar_user"
+                options="{'no_quick_create': True, 'no_create': True, 'no_edit': True}"
+              />
+              <field name="progress" widget="progressbar"/>
+              <field name="total_duration" widget="float_time" sum="Total duration"/>
             </group>
           </group>
           <notebook>
             <page string="Content">
               <field name="line_ids" widget="section_and_note_one2many" mode="tree"
-                  readonly="state == 'cancel' or locked">
+                  readonly="state in ('cancel', 'done') or locked">
                 <tree string="Lines" editable="bottom" limit="200"
                     decoration-muted="review"
                     decoration-warning="need_action"
