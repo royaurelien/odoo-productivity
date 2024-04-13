@@ -113,6 +113,13 @@
               class="btn-primary"
               groups="upgrade_plan.group_advanced"
             />
+            <button
+              name="action_generate_tasks"
+              string="Generate tasks"
+              type="object"
+              class="btn-primary"
+              invisible="not locked"
+            />
             <field name="state" widget="statusbar" statusbar_visible="draft,progress,done"/>
           </header>
         <sheet>

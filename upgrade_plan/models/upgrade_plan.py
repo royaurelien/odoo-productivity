@@ -1,7 +1,8 @@
 # pylint: disable=C0103,C0116
 import ast
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError
 
 UPGRADE_PLAN_STATE = [
     ("draft", "Draft"),
@@ -156,6 +157,13 @@ class UpgradePlan(models.Model):
         self.ensure_one()
 
         self.modules.guess_repository()
+
+    def action_generate_tasks(self):
+        raise UserError(
+            _(
+                "Sorry, this feature isn't implemented, but you can buy me a coffee and I'll take care of it!"
+            )
+        )
 
     def action_view_modules(self):
         self.ensure_one()
