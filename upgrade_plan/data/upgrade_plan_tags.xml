@@ -42,4 +42,10 @@
     <record id="tag_requested_migration" model="upgrade.plan.tags">
         <field name="name">Requested migration</field>
     </record>
+    <record id="tag_depends" model="upgrade.plan.tags">
+        <field name="name">Depends</field>
+    </record>
+    <record id="tag_skeleton" model="upgrade.plan.tags">
+        <field name="name">Skeleton</field>
+    </record>
 </odoo>

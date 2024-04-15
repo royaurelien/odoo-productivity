@@ -25,6 +25,18 @@ class UpgradePlanLine(models.Model):
         default=10,
     )
 
+    parent_id = fields.Many2one(
+        comodel_name="upgrade.plan.line",
+        string="Module",
+        index=True,
+        ondelete="cascade",
+    )
+    child_ids = fields.One2many(
+        comodel_name="upgrade.plan.line",
+        inverse_name="parent_id",
+        string="Features",
+    )
+
     description = fields.Text()
     note = fields.Html()
     author = fields.Char()
@@ -201,3 +213,8 @@ class UpgradePlanLine(models.Model):
                 # number += 1
 
         return super().create(vals_list)
+
+    @api.onchange("parent_id")
+    def _onchange_parent_id(self):
+        if self.parent_id:
+            self.sequence = self.parent_id.sequence + 1

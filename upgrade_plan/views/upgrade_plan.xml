@@ -99,6 +99,14 @@
             invisible="state not in ('draft') or locked"
           />
           <button
+            name="action_progress"
+            string="In Progress"
+            type="object"
+            class="btn-primary"
+            invisible="state != 'done'"
+            groups="upgrade_plan.group_manager"
+          />
+          <button
             name="action_validate"
             string="Validate"
             type="object"
@@ -106,22 +114,22 @@
             invisible="not is_complete or state not in ('progress') or locked"
           />
           <button name="action_lock"
-              type="object"
-              string="Lock"
-              help="If the plan is locked, you can not modify it anymore."
-              invisible="locked or state != 'done'"
-              class="btn-primary"
-              groups="upgrade_plan.group_advanced"
-            />
-            <button
-              name="action_generate_tasks"
-              string="Generate tasks"
-              type="object"
-              class="btn-primary"
-              invisible="not locked"
-            />
-            <field name="state" widget="statusbar" statusbar_visible="draft,progress,done"/>
-          </header>
+            type="object"
+            string="Lock"
+            help="If the plan is locked, you can not modify it anymore."
+            invisible="locked or state != 'done'"
+            class="btn-primary"
+            groups="upgrade_plan.group_advanced"
+          />
+          <button
+            name="action_generate_tasks"
+            string="Generate tasks"
+            type="object"
+            class="btn-primary"
+            invisible="not locked"
+          />
+          <field name="state" widget="statusbar" statusbar_visible="draft,progress,done"/>
+        </header>
         <sheet>
           <div class="oe_button_box" name="button_box">
             <button
@@ -186,13 +194,12 @@
             </group>
           </group>
           <notebook>
-            <page string="Content">
+            <page string="Summary">
               <field name="line_ids" widget="section_and_note_one2many" mode="tree"
                   readonly="state in ('cancel', 'done') or locked">
                 <tree string="Lines" editable="bottom" limit="200"
                     decoration-muted="review"
-                    decoration-warning="need_action"
-                >
+                    decoration-warning="need_action">
                   <control>
                       <create name="add_module_control" string="Add a module" context="{'default_line_type': 'module'}"/>
                       <create name="add_feature_control" string="Add a feature" context="{'default_line_type': 'feature'}"/>
@@ -229,6 +236,7 @@
                   <field name="to_review" column_invisible="True"/>
                   <field name="need_action" column_invisible="True"/>
                 </tree>
+
               </field>
             </page>
             <page string="Other" name="other">

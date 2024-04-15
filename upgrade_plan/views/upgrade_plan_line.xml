@@ -76,14 +76,23 @@
     <field name="model">upgrade.plan.line</field>
     <field name="arch" type="xml">
       <tree editable="bottom" create="1" delete="1" multi_edit="1">
+        <field name="parent_id" required="1" widget="many2one" options="{'no_create': True, 'no_edit': True, 'no_open': True}"/>
         <field name="name"/>
         <field name="description" optional="show"/>
         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
         <field name="project_id" optional="hide"/>
         <field name="create_date" widget="datetime" optional="hide"/>
         <field name="create_uid" widget="many2one_avatar" optional="hide"/>
+        <field
+          name="duration"
+          widget="float_time"
+          sum="Total duration"
+          optional="hide"
+          readonly="plan_id.state == 'done' or plan_id.locked"
+        />
         <field name="need_action" column_invisible="1"/>
         <field name="line_type" column_invisible="1"/>
+        <field name="plan_id" column_invisible="1"/>
       </tree>
     </field>
   </record>
@@ -96,6 +105,7 @@
       <form>
         <field name="review" invisible="1"/>
         <field name="plan_id" invisible="1"/>
+        <field name="sequence" invisible="1"/>
         <header>
           <button name="action_validate" type="object" string="Validate"
                   invisible="review or not action" class="btn-primary"/>
@@ -147,7 +157,23 @@
               <field name="reviewer" invisible="not review" widget="many2one_avatar"/>
               <field name="review_date" invisible="not review" widget="datetime" string="Date"/>
             </group>
+            <separator string="Features" colspan="4"/>
+            <group>
+              <field name="child_ids" nolabel="1" colspan="4"
+                context="{'default_line_type': 'feature', 'parent_id': active_id, 'plan_id': plan_id, 'default_sequence': sequence+1}">
+                <tree editable="bottom">
+                  <field name="sequence" widget="handle"/>
+                  <field name="name"/>
+                  <field name="description"/>
+                  <field name="duration" widget="float_time" sum="Total Duration"/>
+                  <field name="line_type" column_invisible="1"/>
+                  <field name="parent_id" column_invisible="1"/>
+                  <!-- <field name="default_line_type" column_invisible="1"/> -->
+                </tree>
+              </field>
+            </group>
           </group>
+
           <!-- <notebook>
             <page name="summary" string="Summary">
               <group>
@@ -186,9 +212,36 @@
     </field>
   </record>
 
+
+  <!-- PIVOT -->
+  <record id="view_upgrade_plan_line_pivot" model="ir.ui.view">
+      <field name="name">upgrade.plan.line.pivot</field>
+      <field name="model">upgrade.plan.line</field>
+      <field name="arch" type="xml">
+        <pivot string="Summary">
+          <field name="action" type="col"/>
+          <!-- <field name="category" type="row" invisible="1"/> -->
+          <field name="duration" type="measure" widget="float_time"/>
+        </pivot>
+      </field>
+  </record>
+
+  <!-- GRAPH -->
+  <record id="view_upgrade_plan_line_graph" model="ir.ui.view">
+      <field name="name">upgrade.plan.line.grid</field>
+      <field name="model">upgrade.plan.line</field>
+      <field name="arch" type="xml">
+          <graph string="Summary" type="pie" disable_linking="1">
+              <field name="action"/>
+              <!-- <field name="category"/> -->
+              <field name="duration" type="measure" widget="float_time"/>
+          </graph>
+      </field>
+  </record>
+
   <record id="action_view_upgrade_plan_line" model="ir.actions.act_window">
     <field name="name">Lines</field>
     <field name="res_model">upgrade.plan.line</field>
-    <field name="view_mode">tree,form</field>
+    <field name="view_mode">tree,form,grid,graph</field>
   </record>
 </odoo>
