@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_upgrade_plan,access_upgrade_plan,model_upgrade_plan,upgrade_plan.group_user,1,1,1,0
+access_upgrade_plan_manager,access_upgrade_plan_manager,model_upgrade_plan,upgrade_plan.group_manager,1,1,1,1
+access_upgrade_plan_line,access_upgrade_plan_line,model_upgrade_plan_line,upgrade_plan.group_user,1,1,1,0
+access_upgrade_plan_line_manager,access_upgrade_plan_line_manager,model_upgrade_plan_line,upgrade_plan.group_manager,1,1,1,1
+access_upgrade_plan_tags,access_upgrade_plan_tags,model_upgrade_plan_tags,upgrade_plan.group_user,1,1,1,0
+access_upgrade_plan_tags_manager,access_upgrade_plan_tags_manager,model_upgrade_plan_tags,upgrade_plan.group_manager,1,1,1,1

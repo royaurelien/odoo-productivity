@@ -1,0 +1,35 @@
+<odoo>
+    <menuitem
+        id="upgrade_plan_menu_root"
+        name="Upgrade Plan"
+        web_icon="fa fa-map-o,#FFFFFF,#714b67"
+        groups="upgrade_plan.group_user"
+        sequence="99"/>
+
+    <menuitem
+        id="upgrade_plan_menu"
+        name="Upgrade Plans"
+        parent="upgrade_plan_menu_root"
+        sequence="10"
+        action="action_view_upgrade_plan"
+    />
+
+    <menuitem
+        id="upgrade_plan_config"
+        name="Configuration"
+        parent="upgrade_plan_menu_root"
+        groups="upgrade_plan.group_manager"
+        sequence="99"
+    />
+
+    <menuitem
+        id="tags_menu"
+        name="Tags"
+        parent="upgrade_plan_config"
+        sequence="10"
+        action="action_view_upgrade_plan_tags"
+    />
+
+    <!-- <menuitem id="new_app_menu" name="New App" parent="contacts.res_partner_menu_config" sequence="99"/> -->
+    <!-- <menuitem id="upgrade_plan_contacts" name="New Model" parent="new_app_menu" sequence="99" action="action_view_upgrade_plan"/> -->
+</odoo>
