@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="tag_client" model="upgrade.plan.tags">
+        <field name="name">Client</field>
+    </record>
+    <record id="tag_to_review" model="upgrade.plan.tags">
+        <field name="name">To Review</field>
+    </record>
+    <record id="tag_analysis" model="upgrade.plan.tags">
+        <field name="name">Analysis required</field>
+    </record>
+    <record id="tag_waiting" model="upgrade.plan.tags">
+        <field name="name">Waiting for customer</field>
+    </record>
+    <record id="tag_deprecated" model="upgrade.plan.tags">
+        <field name="name">Deprecated</field>
+    </record>
+    <record id="tag_discontinued" model="upgrade.plan.tags">
+        <field name="name">Discontinued</field>
+    </record>
+    <record id="tag_replaced" model="upgrade.plan.tags">
+        <field name="name">Replaced</field>
+    </record>
+    <record id="tag_standard" model="upgrade.plan.tags">
+        <field name="name">Standard</field>
+    </record>
+    <record id="tag_minimal" model="upgrade.plan.tags">
+        <field name="name">Minimal</field>
+    </record>
+    <record id="tag_data_only" model="upgrade.plan.tags">
+        <field name="name">Data only</field>
+    </record>
+    <record id="tag_pr" model="upgrade.plan.tags">
+        <field name="name">PR</field>
+    </record>
+    <record id="tag_help" model="upgrade.plan.tags">
+        <field name="name">Need help</field>
+    </record>
+    <record id="tag_own" model="upgrade.plan.tags">
+        <field name="name">Own</field>
+    </record>
+    <record id="tag_requested_migration" model="upgrade.plan.tags">
+        <field name="name">Requested migration</field>
+    </record>
+    <record id="tag_depends" model="upgrade.plan.tags">
+        <field name="name">Depends</field>
+    </record>
+    <record id="tag_skeleton" model="upgrade.plan.tags">
+        <field name="name">Skeleton</field>
+    </record>
+</odoo>

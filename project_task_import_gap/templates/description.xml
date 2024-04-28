@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="gap2_description">
+        <h3><t t-esc="data['Description précise fonctionnelle']"/></h3>
+        <p>
+            <span><strong>Flux:</strong> <t t-esc="data['Flux']"/> / </span>
+            <span><strong>Sujet:</strong> <t t-esc="data['Sujet']"/> / </span>
+            <span><strong>Niveau de Criticité:</strong> <t t-esc="data['Niveau de Criticité']"/> / </span>
+            <span><strong>Implémentation:</strong> <t t-esc="data['Implémentation']"/></span>
+        </p>
+        <table class="table table-bordered o_table">
+            <tbody>
+                <tr>
+                    <td>Atelier</td>
+                    <td><t t-esc="data['Atelier']"/></td>
+                </tr>
+                <tr>
+                    <td>Atelier sur Paramétrage avancé</td>
+                    <td><t t-esc="data['Atelier sur Paramétrage avancé']"/></td>
+                </tr>
+                <tr>
+                    <td>Développement niveau 1</td>
+                    <td><t t-esc="data['Développement niveau 1']"/></td>
+                </tr>
+                <tr>
+                    <td>Développement Expert</td>
+                    <td><t t-esc="data['Développement Expert']"/></td>
+                </tr>
+                <tr>
+                    <td>Rédaction FD</td>
+                    <td><t t-esc="data['Rédaction FD']"/></td>
+                </tr>
+                <tr>
+                    <td>Tests</td>
+                    <td><t t-esc="data['Tests']"/></td>
+                </tr>
+                <tr>
+                    <td>Total</td>
+                    <td><t t-esc="data['Total']"/></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </template>
+</odoo>

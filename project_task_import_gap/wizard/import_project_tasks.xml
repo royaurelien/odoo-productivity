@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="import_project_tasks_form" model="ir.ui.view">
+        <field name="name">import.project.tasks.form.inherit</field>
+        <field name="model">import.project.tasks</field>
+        <field name="inherit_id" ref="project_task_import.import_project_tasks_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='project_id']" position="after">
+                <field
+                    name="subject_and_flux"
+                    widget="boolean_toggle"
+                />
+                <field
+                    name="tags_times"
+                    widget="boolean_toggle"
+                />
+                <field
+                    name="use_subtasks"
+                    widget="boolean_toggle"
+                />
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
