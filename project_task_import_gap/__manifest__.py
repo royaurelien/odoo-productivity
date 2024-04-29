@@ -1,8 +1,8 @@
 # pylint: disable=W0104
 {
-    "name": "Import GAP",
-    "description": "",
-    "summary": "",
+    "name": "Import Project Tasks (GAP v2)",
+    "description": "Create Project Tasks from GAP v2",
+    "summary": "Create Project Tasks from GAP v2",
     "version": "17.0.1.0.0",
     "category": "Productivity",
     "author": "Aurelien ROY",

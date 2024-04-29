@@ -5,7 +5,7 @@ from io import BytesIO
 
 import openpyxl
 
-from odoo import _, fields, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -21,19 +21,30 @@ class ImportProjectTasks(models.TransientModel):
         help="Select a type which you want to import",
     )
     import_file = fields.Binary(
-        string="Request for Quotation or Order",
+        string="File",
         required=True,
-        help="Upload a Request for Quotation or an Order file. Supported "
-        "formats: XML and PDF (PDF with an embeded XML file).",
+        help="Upload a file. Supported formats: Xlsx.",
     )
     import_filename = fields.Char(
         string="Filename",
     )
-
     project_id = fields.Many2one(
         comodel_name="project.project",
         required=True,
     )
+    use_subtasks = fields.Boolean(
+        default=False,
+    )
+    parent_key = fields.Char()
+    locked = fields.Boolean(
+        default=False,
+    )
+    prefix = fields.Char(
+        string="Name",
+        help="Task name",
+    )
+    sheets = fields.Char()
+    sheets_to_import = fields.Char()
 
     def _get_supported_types(self):
         # Define the supported types dictionary
@@ -45,7 +56,11 @@ class ImportProjectTasks(models.TransientModel):
         }
         return supported_types
 
-    def _parse_file(self, filename, filecontent, detect_doc_type=False):
+    @api.model
+    def _get_workbook(self, filecontent):
+        return openpyxl.load_workbook(BytesIO(filecontent), read_only=True)
+
+    def _parse_file(self, filename, filecontent):
         assert filename, "Missing filename"
         assert filecontent, "Missing file content"
         filetype = mimetypes.guess_type(filename)
@@ -55,7 +70,7 @@ class ImportProjectTasks(models.TransientModel):
 
         _logger.error(type(filecontent))
 
-        workbook = openpyxl.load_workbook(BytesIO(filecontent), read_only=True)
+        workbook = self._get_workbook(filecontent)
 
         # Check if the detected MIME type is supported for the selected import type
         if mimetype not in supported_types["xlsx"]:
@@ -76,6 +91,19 @@ class ImportProjectTasks(models.TransientModel):
                     "the module to support this type?"
                 )
             )
+
+    @api.onchange("import_file")
+    def import_file_change(self):
+        if not self.import_filename or not self.import_file:
+            self.sheets = False
+            return
+
+        workbook = self._get_workbook(b64decode(self.import_file))
+        sheets = workbook.sheetnames
+
+        if sheets is None:
+            return {"warning": "No sheets found !"}
+        self.sheets = ",".join(sheets)
 
     def import_button(self):
         self.ensure_one()

@@ -1,8 +1,8 @@
 # pylint: disable=W0104
 {
-    "name": "Import GAP",
-    "description": "",
-    "summary": "",
+    "name": "Import Project Tasks",
+    "description": "Create Project Tasks from Excel file.",
+    "summary": "Create Project Tasks from Excel file.",
     "version": "17.0.1.0.0",
     "category": "Productivity",
     "author": "Aurelien ROY",
@@ -20,8 +20,7 @@
     },
     "data": [
         "security/ir.model.access.csv",
-        # "data/upgrade_plan_tags.xml",
-        # "views/upgrade_plan.xml",
+        "views/project_project.xml",
         "wizard/import_project_tasks.xml",
     ],
     "demo": [],
