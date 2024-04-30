@@ -21,6 +21,7 @@
     },
     "data": [
         "templates/description.xml",
+        "views/project_task.xml",
         "wizard/import_project_tasks.xml",
     ],
     "demo": [],

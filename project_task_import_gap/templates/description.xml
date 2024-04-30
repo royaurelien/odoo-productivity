@@ -5,7 +5,6 @@
         <p>
             <span><strong>Flux:</strong> <t t-esc="data['Flux']"/> / </span>
             <span><strong>Sujet:</strong> <t t-esc="data['Sujet']"/> / </span>
-            <span><strong>Niveau de Criticité:</strong> <t t-esc="data['Niveau de Criticité']"/> / </span>
             <span><strong>Implémentation:</strong> <t t-esc="data['Implémentation']"/></span>
         </p>
         <table class="table table-bordered o_table">

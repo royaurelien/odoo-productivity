@@ -39,10 +39,7 @@ class ImportProjectTasks(models.TransientModel):
     locked = fields.Boolean(
         default=False,
     )
-    prefix = fields.Char(
-        string="Name",
-        help="Task name",
-    )
+    task_name = fields.Char()
     sheets = fields.Char()
     sheets_to_import = fields.Char()
 
@@ -63,12 +60,10 @@ class ImportProjectTasks(models.TransientModel):
     def _parse_file(self, filename, filecontent):
         assert filename, "Missing filename"
         assert filecontent, "Missing file content"
+
         filetype = mimetypes.guess_type(filename)
-        _logger.debug("Order file mimetype: %s", filetype)
         mimetype = filetype[0]
         supported_types = self._get_supported_types()
-
-        _logger.error(type(filecontent))
 
         workbook = self._get_workbook(filecontent)
 
@@ -84,16 +79,25 @@ class ImportProjectTasks(models.TransientModel):
             )
         if hasattr(self, f"parse_{self.template}"):
             return getattr(self, f"parse_{self.template}")(workbook)
-        else:
-            raise UserError(
-                _(
-                    "This Import Type is not supported. Did you install "
-                    "the module to support this type?"
-                )
+
+        raise UserError(
+            _(
+                "This Import Type is not supported. Did you install "
+                "the module to support this type?"
             )
+        )
+
+    @api.onchange("template")
+    def _onchange_subtasks(self):
+        if not self.use_subtasks:
+            self.parent_key = ""
+
+        if not self.template:
+            self.import_file = False
+            self.import_filename = False
 
     @api.onchange("import_file")
-    def import_file_change(self):
+    def _onchange_import_file(self):
         if not self.import_filename or not self.import_file:
             self.sheets = False
             return
@@ -103,6 +107,7 @@ class ImportProjectTasks(models.TransientModel):
 
         if sheets is None:
             return {"warning": "No sheets found !"}
+
         self.sheets = ",".join(sheets)
 
     def import_button(self):

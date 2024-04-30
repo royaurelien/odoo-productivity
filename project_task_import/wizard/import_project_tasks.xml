@@ -5,40 +5,48 @@
         <field name="model">import.project.tasks</field>
         <field name="arch" type="xml">
             <form string="Import Project Tasks">
-                <group name="technical" invisible="1">
-                    <field name="locked"/>
+                <field name="locked" invisible="1"/>
+                <group>
+                    <group name="project">
+                        <field
+                            name="project_id"
+                            required="True"
+                            readonly="locked"
+                            invisible="locked"
+                            widget="many2one"
+                            options="{'no_create': True, 'no_edit': True, 'no_open': True}"
+                        />
+                        <field name="template" />
+                    </group>
+                    <group name="import">
+                        <field
+                            name="import_file"
+                            filename="import_filename"
+                            readonly="not template"/>
+                        <field name="import_filename" invisible="1" />
+                    </group>
                 </group>
-                <group name="project">
-                    <field
-                        name="project_id"
-                        required="True"
-                        readonly="locked"
-                        invisible="locked"
-                        widget="many2one"
-                        options="{'no_create': True, 'no_edit': True, 'no_open': True}"
-                    />
+                <separator string="Sheets to Import" colspan="4"/>
+                <group name="sheets" invisible="not import_file">
+                    <field name="sheets" readonly="1" colspan="2" nolabel="1"/>
+                    <field name="sheets_to_import" string="To Import" colspan="2" nolabel="1"/>
                 </group>
-                <group name="import">
-                    <field name="template" />
-                    <field
-                        name="import_file"
-                        filename="import_filename"
-                        readonly="not template"/>
-                    <field name="import_filename" invisible="1" />
-                    <field name="sheets" readonly="1" invisible="not import_file"/>
-                    <field name="sheets_to_import" invisible="not import_file"/>
-                </group>
-                <group name="configuration">
-                    <field
-                        name="use_subtasks"
-                        widget="boolean_toggle"
-                    />
-                    <field
-                        name="parent_key"
-                        required="use_subtasks"
-                        invisible="not use_subtasks"
-                    />
-                    <field name="prefix" required="True"/>
+                <separator colspan="4"/>
+                <group>
+                    <group name="configuration" string="Configuration">
+                        <field name="task_name" required="True"/>
+                        <field
+                            name="use_subtasks"
+                            widget="boolean_toggle"
+                        />
+                        <field
+                            name="parent_key"
+                            required="use_subtasks"
+                            invisible="not use_subtasks"
+                        />
+                    </group>
+                    <group name="tags" string="Tags">
+                    </group>
                 </group>
                 <footer>
                     <button

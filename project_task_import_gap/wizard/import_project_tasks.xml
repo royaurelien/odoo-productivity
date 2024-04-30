@@ -5,17 +5,27 @@
         <field name="model">import.project.tasks</field>
         <field name="inherit_id" ref="project_task_import.import_project_tasks_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//group[@name='configuration']" position="after">
-                <group name="option_gap2" invisible="template != 'gap2'">
-                    <field
-                        name="subject_and_flux"
-                        widget="boolean_toggle"
-                    />
-                    <field
-                        name="tags_times"
-                        widget="boolean_toggle"
-                    />
-                </group>
+            <xpath expr="//group[@name='tags']" position="inside">
+                <field
+                    name="tags_subject"
+                    widget="boolean_toggle"
+                    invisible="template != 'gap2'"
+                />
+                <field
+                    name="tags_flux"
+                    widget="boolean_toggle"
+                    invisible="template != 'gap2'"
+                />
+                <field
+                    name="tags_times"
+                    widget="boolean_toggle"
+                    invisible="template != 'gap2'"
+                />
+                <field
+                    name="tags_implementation"
+                    widget="boolean_toggle"
+                    invisible="template != 'gap2'"
+                />
             </xpath>
         </field>
     </record>

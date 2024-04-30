@@ -1,4 +1,4 @@
-# pylint: disable = C0103
+# pylint: disable = C0103,R0201
 
 
 import logging
@@ -62,13 +62,21 @@ class ImportProjectTasks(models.TransientModel):
         ondelete={"gap2": "set default"},
     )
 
-    subject_and_flux = fields.Boolean(
+    tags_subject = fields.Boolean(
         default=False,
-        string="Tags Sujet et flux",
+        string="Subject",
+    )
+    tags_flux = fields.Boolean(
+        default=False,
+        string="Flux",
     )
     tags_times = fields.Boolean(
         default=False,
-        string="Tags Estimation",
+        string="Estimation",
+    )
+    tags_implementation = fields.Boolean(
+        default=False,
+        string="Implementation",
     )
 
     @api.model
@@ -87,16 +95,15 @@ class ImportProjectTasks(models.TransientModel):
     def onchange_template(self):
         if not self.template:
             self.sheets_to_import = ""
-            self.prefix = ""
+            self.task_name = ""
 
         if self.template == "gap2":
             self.sheets_to_import = self._get_default_sheets()
-            self.prefix = self._get_default_task_name()
+            self.task_name = self._get_default_task_name()
 
     @api.onchange("template")
-    def onchange_subtasks(self):
-        if not self.use_subtasks:
-            self.parent_key = ""
+    def _onchange_subtasks(self):
+        super()._onchange_subtasks()
 
         if self.template == "gap2":
             self.parent_key = self._get_default_parent_key()
@@ -107,7 +114,7 @@ class ImportProjectTasks(models.TransientModel):
 
         def _sum(vals, keys):
             items = [vals[name] for name in vals.keys() if name in keys]
-            return sum(filter(lambda x: isinstance(x, float), items))
+            return sum(filter(lambda x: isinstance(x, (float, int)), items))
 
         items = []
         for sheet_name in sheets:
@@ -131,21 +138,21 @@ class ImportProjectTasks(models.TransientModel):
         Tags = self.env["project.tags"].sudo()
         Task = self.env["project.task"].sudo()
         items = []
-        search_tags = []
-
-        if self.subject_and_flux:
-            search_tags.append("subject_and_flux")
-
-        if self.tags_times:
-            search_tags.append("times")
 
         items = self._read_items(workbook)
 
-        if "subject_and_flux" in search_tags:
-            items = prepare_tags(items, ["Sujet", "Flux"], "value")
+        # Prepare tags, inject values
+        if self.tags_subject:
+            items = prepare_tags(items, ["Sujet"], "value")
 
-        if "times" in search_tags:
+        if self.tags_flux:
+            items = prepare_tags(items, ["Flux"], "value")
+
+        if self.tags_times:
             items = prepare_tags(items, TIME_KEYS, "key")
+
+        if self.tags_implementation:
+            items = prepare_tags(items, ["Implémentation"], "value")
 
         # Extract and set tags
         names = extract_tags(items)
@@ -164,7 +171,7 @@ class ImportProjectTasks(models.TransientModel):
             mapping = {item["name"]: item["id"] for item in records.read(["name"])}
             items = set_parents(items, mapping, self.parent_key)
 
-        items = set_key(items, "name", self.prefix)
+        items = set_key(items, "name", self.task_name)
 
         tasks = list(map(Task._prepare_from_gap2, items))
 

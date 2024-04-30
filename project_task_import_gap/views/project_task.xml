@@ -1,0 +1,46 @@
+<odoo>
+  <!-- INHERITED SEARCH VIEW -->
+  <record id="view_task_search_form_project_base" model="ir.ui.view">
+    <field name="name">project.task.select.inherit</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_search_form_project_base"/>
+    <field name="priority" eval="99"/>
+    <field name="arch" type="xml">
+      <xpath expr="//filter[@name='deadline']" position="after">
+        <separator/>
+        <filter string="Flux" name="flux" context="{'group_by': 'flux'}"/>
+        <filter string="Subject" name="subject" context="{'group_by': 'subject'}"/>
+        <filter string="Implementation" name="implementation" context="{'group_by': 'implementation'}"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- INHERITED TREE VIEW -->
+  <record id="project_task_view_tree_base" model="ir.ui.view">
+    <field name="name">project.task.tree.inherited</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.project_task_view_tree_base"/>
+    <field name="priority" eval="99"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='stage_id']" position="before">
+        <field name="flux" optional="hide"/>
+        <field name="subject" optional="hide"/>
+        <field name="implementation" optional="hide"/>
+      </xpath>
+    </field>
+  </record>
+
+  <!-- INHERITED FORM VIEW -->
+  <record id="view_task_form2" model="ir.ui.view">
+    <field name="name">project.task.form.inherited</field>
+    <field name="model">project.task</field>
+    <field name="inherit_id" ref="project.view_task_form2"/>
+    <field name="arch" type="xml">
+      <xpath expr="//field[@name='milestone_id']" position="after">
+        <field name="flux" readonly="0"/>
+        <field name="subject" readonly="0"/>
+        <field name="implementation" readonly="0"/>
+      </xpath>
+    </field>
+  </record>
+</odoo>
